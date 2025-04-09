@@ -1,23 +1,10 @@
 import {defineType, defineField} from 'sanity'
-import {SUPPORTED_LANGUAGES} from '../config/languages'
 
 export default defineType({
   name: 'article',
   title: 'Article',
   type: 'document',
   fields: [
-    defineField({
-      name: 'language',
-      title: 'Language',
-      type: 'string',
-      validation: (Rule) => Rule.required(),
-      options: {
-        list: SUPPORTED_LANGUAGES.map((lang) => ({
-          title: lang.title,
-          value: lang.id,
-        })),
-      },
-    }),
     defineField({
       name: 'title',
       title: 'Title',
@@ -45,22 +32,14 @@ export default defineType({
       title: 'Published At',
       type: 'datetime',
     }),
-    defineField({
-      name: 'translations',
-      title: 'Translations',
-      type: 'array',
-      of: [{type: 'reference', to: [{type: 'article'}]}],
-      description: 'Other language versions of this article. Link them here for easy switching.',
-    }),
   ],
   preview: {
     select: {
       title: 'title',
-      language: 'language',
     },
-    prepare({title, language}) {
+    prepare({title}) {
       return {
-        title: `${title} (${language.toUpperCase()})`,
+        title: title || 'Untitled',
       }
     },
   },

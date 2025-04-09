@@ -4,6 +4,7 @@ import {SUPPORTED_LANGUAGES} from '../config/languages'
 import {translateWithOpenAI} from '../lib/openai'
 import {client} from '../lib/client'
 import {Article, Snippet} from '@generated/schemas'
+import slugify from 'slugify'
 
 export const translateAllLanguages: DocumentActionComponent = (props) => {
   try {
@@ -53,8 +54,8 @@ export const translateAllLanguages: DocumentActionComponent = (props) => {
           await client.create({
             _type: doc._type,
             title: translated.title,
+            slug: slugify(translated.title),
             body: translated.body,
-            language: lang.id,
             translations: [{_type: 'reference', _ref: doc._id}],
           })
         }

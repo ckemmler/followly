@@ -1,11 +1,11 @@
 import { PortableText } from '@portabletext/react'
 import { PortableTextBlock } from 'next-sanity'
 import { LANGUAGES } from '@/utils/languages'
-import { Snippet } from '@/types/generated'
+import { Snippet } from '@generated/schemas'
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET!
-const apiKey = process.env.SANITY_API_KEY!
+const projectId = "d7z4iom2"
+const dataset = "production"
+const apiKey = "skCx8nkpXZ4v9RBHpJUcgYABZEGsYWMY2HR58HfW8GG4RwvV13Q4VG9HB03riFbXmrHCK7EcScGLthb5BH5QmGR1EB4xbKGPbu3eJx1cSIdgASazA10L8in9sEOhPRIP9e4ixWCrKYpdxqynioQjzW2J2vdoJ5WT6vQtqqDs4WT3L00f4beY"
 
 
 export async function generateStaticParams() {
@@ -42,12 +42,12 @@ export async function generateStaticParams() {
    const { lang } = await props.params
    const snippets = await getSnippets(lang)
    return (
-     <main className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
-       <div className="text-center space-y-8 max-w-xl">
-         <h1 className="font-heading text-3xl font-bold">
+     <main className="flex items-center justify-center min-h-screen text-white bg-gray-900">
+       <div className="max-w-xl space-y-8 text-center">
+         <h1 className="text-3xl font-bold font-heading">
            <PortableText value={snippets.welcomeMessage ?? []} />
          </h1>
-         <div className="font-body text-lg">
+         <div className="text-lg font-body">
            <PortableText value={snippets.homepageNotice ?? []} />
          </div>
        </div>

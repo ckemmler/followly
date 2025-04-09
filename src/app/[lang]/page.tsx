@@ -1,15 +1,12 @@
 import { PortableText } from '@portabletext/react'
 import { PortableTextBlock } from 'next-sanity'
 import { LANGUAGES } from '@/utils/languages'
+import { Snippet } from '@/types/generated'
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET!
 const apiKey = process.env.SANITY_API_KEY!
 
-type Snippet = {
-  key: string
-  content: PortableTextBlock[]
-}
 
 export async function generateStaticParams() {
    return LANGUAGES.map(lang => ({ lang }))

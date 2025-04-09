@@ -50,9 +50,9 @@ export async function generateStaticParams() {
          <h1 className="font-heading text-3xl font-bold">
            <PortableText value={snippets.welcomeMessage ?? []} />
          </h1>
-         <p className="font-body text-lg">
+         <div className="font-body text-lg">
            <PortableText value={snippets.homepageNotice ?? []} />
-         </p>
+         </div>
        </div>
      </main>
    )

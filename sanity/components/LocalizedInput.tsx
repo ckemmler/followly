@@ -1,5 +1,5 @@
 // components/LocalizedSlugInput.tsx
-import { Stack, Card, Text, Box, Flex, Select, TextInput } from '@sanity/ui'
+import { Card, Flex, Select, Stack, TextInput } from '@sanity/ui'
 import { ChangeEvent, useState } from 'react'
 import { set, unset } from 'sanity'
 
@@ -36,11 +36,6 @@ export function LocalizedInput({ value = {}, onChange, schemaType }: LocalizedIn
   return (
     <Stack space={3}>
       <Flex>
-        <Box flex={1}>
-          <Text size={1} weight="medium">
-            Slug ({selectedLang})
-          </Text>
-        </Box>
         <Select value={selectedLang} onChange={handleLangChange}>
           {SUPPORTED_LANGUAGES.map((lang) => (
             <option key={lang.id} value={lang.id}>
@@ -54,7 +49,7 @@ export function LocalizedInput({ value = {}, onChange, schemaType }: LocalizedIn
           type="text"
           value={value?.[selectedLang]?.current || ''}
           onChange={handleChange}
-          placeholder={`Slug for ${selectedLang}`}
+          placeholder={`${selectedLang}`}
         />
       </Card>
     </Stack>

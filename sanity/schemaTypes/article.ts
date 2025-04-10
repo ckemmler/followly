@@ -8,13 +8,13 @@ export default defineType({
     defineField({
       name: 'title',
       title: 'Title',
-      type: 'string',
+      type: 'internationalizedArrayString',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
-      type: 'slug',
+      type: 'internationalizedArraySlug',
       options: {
         source: 'title',
         maxLength: 96,
@@ -24,8 +24,8 @@ export default defineType({
     defineField({
       name: 'body',
       title: 'Body',
-      type: 'array',
-      of: [{type: 'block'}],
+      type: 'internationalizedArrayPortableText',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'publishedAt',

@@ -1,6 +1,7 @@
-// sanity/schemaTypes/snippet.ts
-
 import {defineType, defineField} from 'sanity'
+
+// welcomeMessage: Sillages
+// homepageSnippet: Simples fils d'une coexistence invisible, suivons la trame des univers qui nous traversent.
 
 export default defineType({
   name: 'snippet',

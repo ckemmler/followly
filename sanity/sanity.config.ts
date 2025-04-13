@@ -1,12 +1,10 @@
-import {defineConfig} from 'sanity'
+import {defineConfig, isKeySegment} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import schemaTypes from './schemaTypes'
-import {translateAllLanguages} from './actions/translateAllLanguages'
-import {testAction} from './actions/testAction'
-// import {documentInternationalization} from '@sanity/document-internationalization'
-// import {structure} from './structure'
 import {internationalizedArray} from 'sanity-plugin-internationalized-array'
+import {languageFilter} from '@sanity/language-filter'
+import {SUPPORTED_LANGUAGES} from './config/languages'
 
 export default defineConfig({
   name: 'default',
@@ -18,34 +16,51 @@ export default defineConfig({
   plugins: [
     structureTool(),
     visionTool(),
-    //  documentInternationalization({
-    //    supportedLanguages: [
-    //      {id: 'en', title: 'English'},
-    //      {id: 'fr', title: 'French'},
-    //      // Add other languages as needed
-    //    ],
-    //    schemaTypes: ['article', 'snippet'], // Add other schema types as needed
-    //  }),
     internationalizedArray({
-      languages: [
-        {id: 'en', title: 'English'},
-        {id: 'fr', title: 'Français'},
-        {id: 'de', title: 'Deutsch'},
-        // ...add all 24
-      ],
+      languages: SUPPORTED_LANGUAGES,
+      buttonAddAll: false,
+      defaultLanguages: ['fr'],
       fieldTypes: [
         {name: 'string', type: 'string'},
         {name: 'text', type: 'text'},
         {name: 'portableText', type: 'array', of: [{type: 'block'}]},
       ],
     }),
+    languageFilter({
+      // Use the same languages as the internationalized array plugin
+      supportedLanguages: SUPPORTED_LANGUAGES,
+      defaultLanguages: ['fr'],
+      documentTypes: ['snippet', 'article'],
+      filterField: (enclosingType, member, selectedLanguageIds) => {
+        // Filter internationalized arrays
+        if (
+          enclosingType.jsonType === 'object' &&
+          enclosingType.name.startsWith('internationalizedArray') &&
+          'kind' in member
+        ) {
+          // Get last two segments of the field's path
+          const pathEnd = member.field.path.slice(-2)
+          // If the second-last segment is a _key, and the last segment is `value`,
+          // It's an internationalized array value
+          // And the array _key is the language of the field
+          const language =
+            pathEnd[1] === 'value' && isKeySegment(pathEnd[0]) ? pathEnd[0]._key : null
+
+          return language ? selectedLanguageIds.includes(language) : false
+        }
+
+        // Filter internationalized objects if you have them
+        // `localeString` must be registered as a custom schema type
+        if (enclosingType.jsonType === 'object' && enclosingType.name.startsWith('locale')) {
+          return selectedLanguageIds.includes(member.name)
+        }
+
+        return true
+      },
+    }),
   ],
 
   schema: {
     types: schemaTypes,
-  },
-
-  document: {
-    actions: (prev) => [...prev, translateAllLanguages, testAction],
   },
 })

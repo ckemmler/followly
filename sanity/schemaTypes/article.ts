@@ -6,6 +6,12 @@ export default defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'id',
+      title: 'Id',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'title',
       title: 'Title',
       type: 'internationalizedArrayString',
@@ -14,7 +20,7 @@ export default defineType({
     defineField({
       name: 'slug',
       title: 'Slug',
-      type: 'internationalizedArraySlug',
+      type: 'internationalizedArrayString',
       options: {
         source: 'title',
         maxLength: 96,
@@ -35,11 +41,11 @@ export default defineType({
   ],
   preview: {
     select: {
-      title: 'title',
+      id: 'id',
     },
-    prepare({title}) {
+    prepare({id}) {
       return {
-        title: title || 'Untitled',
+        title: id || 'Untitled',
       }
     },
   },

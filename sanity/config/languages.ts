@@ -1,7 +1,7 @@
 // sanity/config/languages.ts
 export const SUPPORTED_LANGUAGES = [
-  {id: 'en', title: 'English'},
   {id: 'fr', title: 'Français'},
+  {id: 'en', title: 'English'},
   {id: 'da', title: 'Dansk'},
   {id: 'de', title: 'Deutsch'},
   {id: 'es', title: 'Español'},

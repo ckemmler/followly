@@ -5,6 +5,7 @@ import schemaTypes from './schemaTypes'
 import {internationalizedArray} from 'sanity-plugin-internationalized-array'
 import {languageFilter} from '@sanity/language-filter'
 import {SUPPORTED_LANGUAGES} from './config/languages'
+import {assist} from '@sanity/assist'
 
 export default defineConfig({
   name: 'default',
@@ -16,6 +17,14 @@ export default defineConfig({
   plugins: [
     structureTool(),
     visionTool(),
+    assist({
+      translate: {
+        field: {
+          documentTypes: ['article', 'snippet'],
+          languages: SUPPORTED_LANGUAGES,
+        },
+      },
+    }),
     internationalizedArray({
       languages: SUPPORTED_LANGUAGES,
       buttonAddAll: false,

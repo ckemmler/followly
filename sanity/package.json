@@ -4,6 +4,7 @@
    "version": "1.0.0",
    "main": "package.json",
    "license": "UNLICENSED",
+   "type": "module",
    "scripts": {
       "dev": "sanity dev",
       "start": "sanity start",
@@ -15,6 +16,7 @@
       "sanity"
    ],
    "dependencies": {
+      "@sanity/assist": "^4.0.1",
       "@sanity/document-internationalization": "^3.3.1",
       "@sanity/language-filter": "^4.0.4",
       "@sanity/vision": "^3.83.0",
@@ -29,6 +31,7 @@
       "styled-components": "^6.1.15"
    },
    "devDependencies": {
+      "@sanity/codegen": "^3.85.1",
       "@sanity/eslint-config-studio": "^5.0.2",
       "@types/react": "^18.0.25",
       "eslint": "^9.9.0",

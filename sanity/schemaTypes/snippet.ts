@@ -27,6 +27,11 @@ export default defineType({
       title: 'Content',
       type: 'internationalizedArrayPortableText',
       validation: (Rule) => Rule.required(),
+      options: {
+        aiAssist: {
+          translateAction: true,
+        },
+      },
     }),
   ],
   preview: {

@@ -36,6 +36,10 @@ export type {
   SanityImagePaletteSwatch,
 };
 
+import type {
+   
+}
+
 /**
  * Article
  *
@@ -45,55 +49,32 @@ export interface Article extends SanityDocument {
   _type: "article";
 
   /**
-   * Language — `string`
+   * Id — `string`
    *
    *
    */
-  language?:
-    | "en"
-    | "fr"
-    | "de"
-    | "es"
-    | "it"
-    | "pl"
-    | "ro"
-    | "nl"
-    | "pt"
-    | "cs"
-    | "sk"
-    | "hu"
-    | "bg"
-    | "hr"
-    | "sl"
-    | "lt"
-    | "lv"
-    | "et"
-    | "fi"
-    | "sv"
-    | "el"
-    | "mt"
-    | "ga";
+  id?: string;
 
   /**
-   * Title — `string`
+   * Title — `internationalizedArrayString`
    *
    *
    */
-  title?: string;
+  title?: InternationalizedArrayString;
 
   /**
-   * Slug — `slug`
+   * Slug — `internationalizedArrayString`
    *
    *
    */
-  slug?: { _type: "slug"; current: string };
+  slug?: InternationalizedArrayString;
 
   /**
-   * Body — `array`
+   * Body — `internationalizedArrayPortableText`
    *
    *
    */
-  body?: Array<SanityKeyed<SanityBlock>>;
+  body?: InternationalizedArrayPortableText;
 
   /**
    * Published At — `datetime`
@@ -101,13 +82,6 @@ export interface Article extends SanityDocument {
    *
    */
   publishedAt?: string;
-
-  /**
-   * Translations — `array`
-   *
-   * Other language versions of this article. Link them here for easy switching.
-   */
-  translations?: Array<SanityKeyedReference<Article>>;
 }
 
 /**
@@ -126,48 +100,43 @@ export interface Snippet extends SanityDocument {
   key?: string;
 
   /**
-   * Language — `string`
+   * Content — `internationalizedArrayPortableText`
    *
    *
    */
-  language?:
-    | "en"
-    | "fr"
-    | "de"
-    | "es"
-    | "it"
-    | "pl"
-    | "ro"
-    | "nl"
-    | "pt"
-    | "cs"
-    | "sk"
-    | "hu"
-    | "bg"
-    | "hr"
-    | "sl"
-    | "lt"
-    | "lv"
-    | "et"
-    | "fi"
-    | "sv"
-    | "el"
-    | "mt"
-    | "ga";
-
-  /**
-   * Content — `array`
-   *
-   *
-   */
-  content?: Array<SanityKeyed<SanityBlock>>;
-
-  /**
-   * Translations — `array`
-   *
-   * Optional: manually link translations of this snippet across other languages
-   */
-  translations?: Array<SanityKeyedReference<Snippet>>;
+  content?: InternationalizedArrayPortableText;
 }
 
+export type InternationalizedArraySlug = Array<
+  SanityKeyed<{
+    /**
+     * locale — `string`
+     *
+     *
+     */
+    locale?: string;
+
+    /**
+     * value — `slug`
+     *
+     *
+     */
+    value?: { _type: "value"; current: string };
+  }>
+>;
+
 export type Documents = Article | Snippet;
+
+/**
+ * This interface is a stub. It was referenced in your sanity schema but
+ * the definition was not actually found. Future versions of
+ * sanity-codegen will let you type this explicity.
+ */
+type InternationalizedArrayString = any;
+
+/**
+ * This interface is a stub. It was referenced in your sanity schema but
+ * the definition was not actually found. Future versions of
+ * sanity-codegen will let you type this explicity.
+ */
+type InternationalizedArrayPortableText = any;

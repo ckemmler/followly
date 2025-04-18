@@ -16,6 +16,11 @@ export default defineType({
       title: 'Title',
       type: 'internationalizedArrayString',
       validation: (Rule) => Rule.required(),
+      options: {
+        aiAssist: {
+          translateAction: true,
+        },
+      },
     }),
     defineField({
       name: 'slug',
@@ -24,6 +29,9 @@ export default defineType({
       options: {
         source: 'title',
         maxLength: 96,
+        aiAssist: {
+          translateAction: true,
+        },
       },
       validation: (Rule) => Rule.required(),
     }),
@@ -32,6 +40,11 @@ export default defineType({
       title: 'Body',
       type: 'internationalizedArrayPortableText',
       validation: (Rule) => Rule.required(),
+      options: {
+        aiAssist: {
+          translateAction: true,
+        },
+      },
     }),
     defineField({
       name: 'publishedAt',

@@ -1,20 +1,18 @@
-import { PortableText } from '@portabletext/react'
-import { PortableTextBlock } from 'next-sanity'
-import { LANGUAGES } from '@/utils/languages'
+import { getLocalizedBlock, LANGUAGES, LocalizedBlock } from '@/utils/languages'
 import { Snippet } from '@generated/schemas'
+import { PortableText } from '@portabletext/react'
 
 const projectId = "d7z4iom2"
 const dataset = "production"
 const apiKey = "skCx8nkpXZ4v9RBHpJUcgYABZEGsYWMY2HR58HfW8GG4RwvV13Q4VG9HB03riFbXmrHCK7EcScGLthb5BH5QmGR1EB4xbKGPbu3eJx1cSIdgASazA10L8in9sEOhPRIP9e4ixWCrKYpdxqynioQjzW2J2vdoJ5WT6vQtqqDs4WT3L00f4beY"
 
-
 export async function generateStaticParams() {
    return LANGUAGES.map(lang => ({ lang }))
  }
 
- async function getSnippets(lang: string): Promise<Record<string, PortableTextBlock[]>> {
+ async function getSnippets(): Promise<Record<string, LocalizedBlock[]>> {
    const query = `
-     *[_type == "snippet" && language == "${lang}" && key in ["welcomeMessage", "homepageNotice"]] {
+     *[_type == "snippet" && key in ["welcomeMessage", "homepageSnippet"]] {
        key,
        content
      }
@@ -40,15 +38,16 @@ export async function generateStaticParams() {
  
  export default async function LangPage(props: { params: Promise<{ lang: string }> }) {
    const { lang } = await props.params
-   const snippets = await getSnippets(lang)
+   const snippets = await getSnippets()
+   console.log(snippets.homepageSnippet.filter(s => s._key === lang))
    return (
      <main className="flex items-center justify-center min-h-screen text-white bg-gray-900">
        <div className="max-w-xl space-y-8 text-center">
          <h1 className="text-3xl font-bold font-heading">
-           <PortableText value={snippets.welcomeMessage ?? []} />
+            <PortableText value={getLocalizedBlock(snippets.welcomeMessage, lang)} />
          </h1>
          <div className="text-lg font-body">
-           <PortableText value={snippets.homepageNotice ?? []} />
+            <PortableText value={getLocalizedBlock(snippets.homepageSnippet, lang)} />
          </div>
        </div>
      </main>

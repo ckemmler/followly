@@ -1,44 +1,6 @@
-import type {
-  SanityReference,
-  SanityKeyedReference,
-  SanityAsset,
-  SanityImage,
-  SanityFile,
-  SanityGeoPoint,
-  SanityBlock,
-  SanityDocument,
-  SanityImageCrop,
-  SanityImageHotspot,
-  SanityKeyed,
-  SanityImageAsset,
-  SanityImageMetadata,
-  SanityImageDimensions,
-  SanityImagePalette,
-  SanityImagePaletteSwatch,
-} from "sanity-codegen";
+import type { SanityReference, SanityKeyedReference, SanityAsset, SanityImage, SanityFile, SanityGeoPoint, SanityBlock, SanityDocument, SanityImageCrop, SanityImageHotspot, SanityKeyed, SanityImageAsset, SanityImageMetadata, SanityImageDimensions, SanityImagePalette, SanityImagePaletteSwatch } from "sanity-codegen";
 
-export type {
-  SanityReference,
-  SanityKeyedReference,
-  SanityAsset,
-  SanityImage,
-  SanityFile,
-  SanityGeoPoint,
-  SanityBlock,
-  SanityDocument,
-  SanityImageCrop,
-  SanityImageHotspot,
-  SanityKeyed,
-  SanityImageAsset,
-  SanityImageMetadata,
-  SanityImageDimensions,
-  SanityImagePalette,
-  SanityImagePaletteSwatch,
-};
-
-import type {
-   
-}
+export type { SanityReference, SanityKeyedReference, SanityAsset, SanityImage, SanityFile, SanityGeoPoint, SanityBlock, SanityDocument, SanityImageCrop, SanityImageHotspot, SanityKeyed, SanityImageAsset, SanityImageMetadata, SanityImageDimensions, SanityImagePalette, SanityImagePaletteSwatch };
 
 /**
  * Article
@@ -91,6 +53,13 @@ export interface Article extends SanityDocument {
  */
 export interface Snippet extends SanityDocument {
   _type: "snippet";
+
+  /**
+   * Language — `string`
+   *
+   *
+   */
+  language?: string;
 
   /**
    * Key — `string`

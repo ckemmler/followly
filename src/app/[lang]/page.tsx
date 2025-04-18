@@ -1,6 +1,7 @@
 import { getLocalizedBlock, LANGUAGES, LocalizedBlock } from '@/utils/languages'
 import { Snippet } from '@generated/schemas'
 import { PortableText } from '@portabletext/react'
+import LanguageSelector from '@/components/LanguageSelector'
 
 const projectId = "d7z4iom2"
 const dataset = "production"
@@ -41,15 +42,20 @@ export async function generateStaticParams() {
    const snippets = await getSnippets()
    console.log(snippets.homepageSnippet.filter(s => s._key === lang))
    return (
-     <main className="flex items-center justify-center min-h-screen text-white bg-gray-900">
-       <div className="max-w-xl space-y-8 text-center">
-         <h1 className="text-3xl font-bold font-heading">
-            <PortableText value={getLocalizedBlock(snippets.welcomeMessage, lang)} />
-         </h1>
-         <div className="text-lg font-body">
-            <PortableText value={getLocalizedBlock(snippets.homepageSnippet, lang)} />
-         </div>
+     <div className="relative min-h-screen bg-gray-900">
+       <div className="absolute top-4 right-4">
+         <LanguageSelector currentLang={lang} languages={LANGUAGES} />
        </div>
-     </main>
+       <main className="flex items-center justify-center min-h-screen text-white">
+         <div className="max-w-xl space-y-8 text-center">
+           <h1 className="text-3xl font-bold font-heading">
+              <PortableText value={getLocalizedBlock(snippets.welcomeMessage, lang)} />
+           </h1>
+           <div className="text-lg font-body">
+              <PortableText value={getLocalizedBlock(snippets.homepageSnippet, lang)} />
+           </div>
+         </div>
+       </main>
+     </div>
    )
  }

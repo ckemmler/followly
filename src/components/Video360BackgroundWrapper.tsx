@@ -2,11 +2,10 @@
 
 import dynamic from 'next/dynamic'
 
-// Dynamically import the actual video background
 const Video360Background = dynamic(() => import('./Video360Background'), { ssr: false })
 
-const ClientVideo360Wrapper = () => {
-  return <Video360Background />
+const ClientVideo360Wrapper = ({ playbackId }: { playbackId: string }) => {
+  return <Video360Background playbackId={playbackId} />
 }
 
 export default ClientVideo360Wrapper

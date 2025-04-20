@@ -3,10 +3,11 @@ import { Snippet } from '@generated/schemas'
 import { PortableText } from '@portabletext/react'
 import LanguageSelector from '@/components/LanguageSelector'
 import ClientVideo360Wrapper from '@/components/Video360BackgroundWrapper'
+import getVideoByTitle from '@/utils/get-video-by-title'
 
-const projectId = "d7z4iom2"
-const dataset = "production"
-const apiKey = "skCx8nkpXZ4v9RBHpJUcgYABZEGsYWMY2HR58HfW8GG4RwvV13Q4VG9HB03riFbXmrHCK7EcScGLthb5BH5QmGR1EB4xbKGPbu3eJx1cSIdgASazA10L8in9sEOhPRIP9e4ixWCrKYpdxqynioQjzW2J2vdoJ5WT6vQtqqDs4WT3L00f4beY"
+const apiKey = process.env.SANITY_API_KEY;
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
 
 export async function generateStaticParams() {
   return LANGUAGES.map(lang => ({ lang }))
@@ -41,7 +42,9 @@ async function getSnippets(): Promise<Record<string, LocalizedBlock[]>> {
 export default async function LangPage(props: { params: Promise<{ lang: string }> }) {
   const { lang } = await props.params
   const snippets = await getSnippets()
-  
+  const video = await getVideoByTitle("Video Test") // this is the video title in Sanity
+
+  console.log(video)
   return (
     <div className="relative min-h-screen bg-gray-900 ">
       
@@ -61,7 +64,7 @@ export default async function LangPage(props: { params: Promise<{ lang: string }
           </div>
         </div>
       </main>
-      <ClientVideo360Wrapper />
+      {video?.playbackId && <ClientVideo360Wrapper playbackId={video.playbackId} />}
     </div>
   )
 }

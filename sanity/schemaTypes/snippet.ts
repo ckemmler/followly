@@ -6,7 +6,7 @@ import {defineType, defineField} from 'sanity'
 // en: Lingerings
 export default defineType({
   name: 'snippet',
-  title: 'Snippet',
+  title: 'Snippets',
   type: 'document',
   fields: [
     defineField({

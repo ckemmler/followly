@@ -2,7 +2,7 @@ import {defineType, defineField} from 'sanity'
 
 export default defineType({
   name: 'article',
-  title: 'Article',
+  title: 'Articles',
   type: 'document',
   fields: [
     defineField({

@@ -5,6 +5,7 @@
 :root {
   --font-cinzel: "Cinzel", serif;
   --font-cormorant: "Cormorant Garamond", serif;
+  --font-libre: "Libre Baskerville", serif;
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -20,4 +21,15 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-body);
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }

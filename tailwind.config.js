@@ -9,6 +9,7 @@ module.exports = {
     extend: {
       fontFamily: {
         heading: ["var(--font-cinzel)", "serif"],
+        libre: ["var(--font-libre)", "serif"],
         body: ["var(--font-cormorant)", "serif"],
       },
     },

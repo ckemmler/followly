@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  followly-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3000" # Host port 3002 forwards to container port 3000
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3000
+      - NODE_ENV=development
+    volumes:
+      - .:/app # Optional: Live code updates if you want (remove if not needed)
+    command: npm run dev
+    restart: unless-stopped

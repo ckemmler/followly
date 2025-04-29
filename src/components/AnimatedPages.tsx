@@ -30,7 +30,7 @@ export default function AnimatedPages({ localizedContent }: AnimatedPagesProps) 
     if (!container || sections.length === 0) return;
 
     // Reset any existing animations
-    ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    ScrollTrigger.getAll().forEach((trigger: ScrollTrigger) => trigger.kill());
 
     // Configure each section for fullscreen view
     sections.forEach((section) => {
@@ -97,38 +97,38 @@ export default function AnimatedPages({ localizedContent }: AnimatedPagesProps) 
   }, []);
 
   return (
-    <div ref={containerRef} className="w-full min-h-screen overflow-y-auto pointer-events-auto text-white no-scrollbar">
+    <div ref={containerRef} className="w-full min-h-screen overflow-y-auto text-white pointer-events-auto no-scrollbar">
       <div
-        className="min-h-screen flex flex-col items-center justify-center"
+        className="flex flex-col items-center justify-center min-h-screen"
         ref={(el) => {
           if (el) sectionsRef.current[0] = el;
         }}
       >
-        <div className="max-w-xl text-center px-4 justify-center items-center flex-col flex">
-          <h1 className="text-3xl font-libre font-bold italic">Followly</h1>
+        <div className="flex flex-col items-center justify-center max-w-xl px-4 text-center">
+          <h1 className="text-3xl italic font-bold font-libre">Followly</h1>
           <IoIosArrowRoundDown className="mt-20" size={30} />
         </div>
       </div>
 
       <div
-        className="min-h-screen flex flex-col items-center justify-center"
+        className="flex flex-col items-center justify-center min-h-screen"
         ref={(el) => {
           if (el) sectionsRef.current[1] = el;
         }}
       >
-        <div className="max-w-xl text-center px-4 flex justify-center items-center flex-col">
+        <div className="flex flex-col items-center justify-center max-w-xl px-4 text-center">
           <PortableText value={localizedContent.navigation} />
           <IoIosArrowRoundDown className="mt-20" size={30} />
         </div>
       </div>
 
       <div
-        className="min-h-screen flex flex-col items-center justify-center"
+        className="flex flex-col items-center justify-center min-h-screen"
         ref={(el) => {
           if (el) sectionsRef.current[2] = el;
         }}
       >
-        <div className="max-w-xl text-center px-4 ">
+        <div className="max-w-xl px-4 text-center ">
           <PortableText value={localizedContent.welcome} />
         </div>
       </div>

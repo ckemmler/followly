@@ -5,12 +5,12 @@ export default defineType({
   title: 'Script',
   type: 'document',
   fields: [
-    defineField({
-      name: 'title',
-      title: 'Title',
-      type: 'string',
-      validation: Rule => Rule.required(),
-    }),
+		defineField({
+			name: 'id',
+			title: 'ID',
+			type: 'string',
+			validation: Rule => Rule.required(),
+		}),
     defineField({
       name: 'sequence',
       title: 'Card Sequence',

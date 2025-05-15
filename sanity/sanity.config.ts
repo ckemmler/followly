@@ -41,7 +41,7 @@ export default defineConfig({
       // Use the same languages as the internationalized array plugin
       supportedLanguages: SUPPORTED_LANGUAGES,
       defaultLanguages: ['fr'],
-      documentTypes: ['snippet', 'article'],
+      documentTypes: ['snippet', 'article', 'card', 'script', 'video'],
       filterField: (enclosingType, member, selectedLanguageIds) => {
         // Filter internationalized arrays
         if (

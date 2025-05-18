@@ -7,6 +7,7 @@ import {languageFilter} from '@sanity/language-filter'
 import {SUPPORTED_LANGUAGES} from './config/languages'
 import {assist} from '@sanity/assist'
 import {muxInput} from 'sanity-plugin-mux-input'
+import { codeInput } from '@sanity/code-input'
 
 export default defineConfig({
   name: 'default',
@@ -19,6 +20,7 @@ export default defineConfig({
     structureTool(),
     visionTool(),
     muxInput(),
+		codeInput(),
     assist({
       translate: {
         field: {
@@ -41,7 +43,7 @@ export default defineConfig({
       // Use the same languages as the internationalized array plugin
       supportedLanguages: SUPPORTED_LANGUAGES,
       defaultLanguages: ['fr'],
-      documentTypes: ['snippet', 'article', 'card', 'script', 'video'],
+      documentTypes: ['snippet', 'article', 'card', 'script', 'video', 'frame', 'scene'],
       filterField: (enclosingType, member, selectedLanguageIds) => {
         // Filter internationalized arrays
         if (

@@ -5,123 +5,135 @@ export default defineType({
   title: 'Script',
   type: 'document',
   fields: [
-		defineField({
-			name: 'id',
-			title: 'ID',
-			type: 'string',
-			validation: Rule => Rule.required(),
-		}),
     defineField({
-      name: 'sequence',
-      title: 'Card Sequence',
+      name: 'id',
+      title: 'ID',
+      type: 'string',
+      validation: Rule => Rule.required(),
+    }),
+    defineField({
+      name: 'stack',
+      title: 'Frame Stack',
       type: 'array',
       of: [
         {
+          name: 'frameReference',
           type: 'object',
-          name: 'scriptStep',
-          title: 'Script Step',
+          title: 'Frame Step',
           fields: [
             defineField({
-              name: 'card',
-              title: 'Card',
+              name: 'frame',
+              title: 'Frame',
               type: 'reference',
-              to: [{ type: 'card' }],
+              to: [{ type: 'frame' }],
               validation: Rule => Rule.required(),
             }),
             defineField({
-              name: 'navigation',
-              title: 'Navigation Logic',
-              type: 'object',
-              fields: [
-                defineField({
-                  name: 'onClick',
-                  title: 'On Click',
-                  type: 'object',
-                  fields: [
-                    defineField({ name: 'goToCardId', type: 'string', title: 'Go To Card ID' }),
-                  ]
-                }),
-                defineField({
-                  name: 'onTimeout',
-                  title: 'On Timeout',
-                  type: 'object',
-                  fields: [
-                    defineField({ name: 'duration', type: 'number', title: 'Delay (in seconds)' }),
-                    defineField({ name: 'goToCardId', type: 'string', title: 'Go To Card ID' }),
-                  ]
-                }),
-                defineField({
-                  name: 'onChoice',
-                  title: 'On User Choice',
-                  type: 'object',
-                  options: { collapsible: true },
-                  fields: [
-                    defineField({
-                      name: 'choices',
-                      type: 'array',
-                      title: 'Choices Mapping',
-                      of: [
-                        {
-                          type: 'object',
-                          name: 'choice',
-                          fields: [
-                            defineField({ name: 'option', type: 'string', title: 'User Option (e.g., "calm")' }),
-                            defineField({ name: 'goToCardId', type: 'string', title: 'Go To Card ID' }),
-                          ]
-                        }
-                      ]
-                    })
-                  ]
-                }),
-                defineField({
-                  name: 'onLLM',
-                  title: 'On LLM Decision',
-                  type: 'object',
-                  fields: [
-                    defineField({
-                      name: 'promptTemplate',
-                      type: 'text',
-                      title: 'Prompt Template',
-                      description: 'Supports {{ input }} and {{ history }} placeholders'
-                    }),
-                    defineField({
-                      name: 'resolver',
-                      type: 'string',
-                      title: 'Resolver Function Name',
-                      description: 'Client-side or API function to call'
-                    }),
-                  ]
-                }),
-                defineField({
-                  name: 'onScriptEnd',
-                  title: 'On Script End',
-                  type: 'object',
-                  fields: [
-                    defineField({ name: 'goToScriptId', type: 'string', title: 'Go To Script ID' }),
-                  ]
-                }),
-              ]
-            }),
-            defineField({
-              name: 'customAnimation',
-              title: 'Custom Animation (Framer / CSS)',
-              type: 'string',
-            }),
+							name: 'triggers',
+							title: 'Event Triggers',
+							type: 'array',
+							of: [
+								{
+									type: 'object',
+									title: 'Trigger',
+									fields: [
+										defineField({
+											name: 'type',
+											title: 'Event Type',
+											type: 'string',
+											options: {
+												list: [
+													{ title: 'Standard', value: 'standard' },
+													{ title: 'Custom', value: 'custom' },
+												],
+												layout: 'radio',
+											},
+											validation: Rule => Rule.required(),
+										}),
+										defineField({
+											name: 'standardEvent',
+											title: 'Standard Event',
+											type: 'string',
+											options: {
+												list: [
+													{ title: 'onClick', value: 'onClick' },
+													{ title: 'onScrollDown', value: 'onScrollDown' },
+													{ title: 'onScrollUp', value: 'onScrollUp' },
+													{ title: 'onTimeout', value: 'onTimeout' },
+												],
+											},
+											hidden: ({ parent }) => parent?.type !== 'standard',
+											validation: Rule => Rule.custom((val, ctx) => {
+												const parent = ctx.parent as { type?: string }
+												return parent.type === 'standard' && !val
+													? 'You must choose a standard event'
+													: true
+											}),
+										}),
+										defineField({
+											name: 'customEvent',
+											title: 'Custom Event Name',
+											type: 'string',
+											description: 'Component-generated event name',
+											hidden: ({ parent }) => parent?.type !== 'custom',
+											validation: Rule => Rule.custom((val, ctx) => {
+												const parent = ctx.parent as { type?: string }
+												return parent.type === 'custom' && !val
+													? 'You must enter a custom event name'
+													: true
+											}),
+										}),
+										defineField({
+											name: 'goTo',
+											title: 'Go To Frame',
+											type: 'reference',
+											to: [{ type: 'frame' }],
+											validation: Rule => Rule.required(),
+										}),
+									],
+									preview: {
+										select: {
+											type: 'type',
+											standard: 'standardEvent',
+											custom: 'customEvent',
+											targetTitle: 'goTo.title', // Assumes frame has a 'title' field
+										},
+										prepare({ type, standard, custom, targetTitle }) {
+											const eventName = type === 'standard' ? standard : custom
+											return {
+												title: eventName || 'Unnamed Event',
+												subtitle: targetTitle ? `→ ${targetTitle}` : 'No target frame',
+											}
+										}
+									}
+								},
+							],
+						})
           ],
-					preview: {
-						select: {
-							title: 'card.title',
-							cardType: 'card.cardType',
-						},
-						prepare({ title, cardType }) {
-							return {
-								title: title || 'Untitled Card',
-								subtitle: cardType ? `Type: ${cardType}` : undefined,
-							}
-						},
-					}
-        }
-      ]
-    }) 
-  ]
+          preview: {
+            select: {
+              title: 'frame.title'
+            },
+            prepare({ title }) {
+              return {
+                title: title || 'Untitled Frame'
+              }
+            },
+          },
+        },
+      ],
+    }),
+  ],
+	preview: {
+		select: {
+			title: 'id',
+			stack: 'stack',
+		},
+		prepare({ title, stack }) {
+			const frameCount = Array.isArray(stack) ? stack.length : 0
+			return {
+				title: `${title} (${frameCount} frame${frameCount !== 1 ? 's' : ''})`,
+			}
+		}
+	}
 })

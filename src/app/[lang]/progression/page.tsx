@@ -1,6 +1,8 @@
-import { createClient } from 'next-sanity'
-import { getScriptById } from '@/utils/queries'
+import Card from '@/components/Card'
+import { getSceneById } from '@/utils/queries'
+import { Frame, Scene, Script } from '@sanity-types'
 import { PortableText } from '@portabletext/react'
+import { createClient } from 'next-sanity'
 import { SUPPORTED_LANGUAGES } from '../../../../sanity/config/languages'
 
 export async function generateStaticParams() {
@@ -11,7 +13,7 @@ export async function generateStaticParams() {
 const client = createClient({
   projectId: 'd7z4iom2',
   dataset: 'production',
-  apiVersion: '2023-01-01',
+  apiVersion: '2025-05-15',
   useCdn: true,
 })
 
@@ -22,35 +24,37 @@ export default async function ProgressionPage({
 }: {
   params: { lang: string }
 }) {
-  const script = await client.fetch(getScriptById(INITIAL_SCRIPT_ID))
+  // const script: Script = await client.fetch(getScriptById(INITIAL_SCRIPT_ID))
+  const scene: Scene = await client.fetch(getSceneById(INITIAL_SCRIPT_ID))
+	const script = scene.script as unknown as Script;
+	const stack = script.stack as unknown as Array<{frame: Frame; _id: string}>
 
 	if (!script) {
 		return (
-			<main className="p-6">
+			<main>
 				<p className="text-red-600">Error: No script found. Check your script ID.</p>
 			</main>
 		)
 	}
 
   return (
-    <main className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">{script.title}</h1>
+    <main>
+      <h1 className="text-2xl font-bold">{scene.title}</h1>
 
-      {script.sequence.map((step: any, i: number) => {
-        const card = step.card
-        const localized = card.text?.find((entry: any) => entry._key === params.lang)
-
-        return (
-          <div key={card._id}>
-            <h2 className="text-lg font-semibold">{card.title}</h2>
-            {localized ? (
-              <PortableText value={localized.value} />
-            ) : (
-              <p className="text-sm italic text-gray-500">No {params.lang} translation available.</p>
-            )}
-          </div>
-        )
-      })}
+      {stack.map((frame: {frame: Frame, _id: string}, index: number) => {
+const localized = frame.frame.text?.find(
+  (entry) => entry._key === params.lang
+)
+  return (
+    <Card key={index}>
+      {localized?.value ? (
+        <PortableText value={localized.value} />
+      ) : (
+        <p className="italic text-gray-400">No {params.lang} translation.</p>
+      )}
+    </Card>
+  )
+})}
     </main>
   )
 }

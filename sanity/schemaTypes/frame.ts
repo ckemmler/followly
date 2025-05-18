@@ -1,8 +1,8 @@
 import { defineType, defineField } from 'sanity'
 
 export default defineType({
-  name: 'card',
-  title: 'Card',
+  name: 'frame',
+  title: 'Frame',
   type: 'document',
   fields: [
     defineField({
@@ -23,8 +23,8 @@ export default defineType({
 		}),
 
     defineField({
-      name: 'cardType',
-      title: 'Card Type',
+      name: 'frameType',
+      title: 'Frame Type',
       type: 'string',
       options: {
         list: [
@@ -75,7 +75,7 @@ export default defineType({
 		},
 		prepare({ title }) {
 			return {
-				title: title || 'Untitled Card',
+				title: title || 'Untitled Frame',
 			}
 		},
 	},})

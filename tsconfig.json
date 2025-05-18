@@ -29,9 +29,12 @@
             "@sanity/*": [
                 "./src/sanity/*"
             ],
-            "@generated/*": [
-                "./sanity-types/*"
-            ]
+				"@sanity-types": [
+					"./sanity/sanity.types.ts"
+				],
+				"@utils/*": [
+					"./src/utils/*"
+				]
         }
     },
     "include": [

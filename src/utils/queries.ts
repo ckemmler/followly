@@ -39,3 +39,9 @@ export const getSceneById = (id: string) => `
     },
   }
 `
+
+export const getAllSceneIds = () => `
+  *[_type == "scene"] {
+    "id": id
+  }
+`;

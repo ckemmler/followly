@@ -14,7 +14,7 @@ type Props = {
 	}
 }
 
-export default function ProgressionClient({ params, scene, stack }: Props) {
+export default function SceneClient({ params, scene, stack }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const touchStartY = useRef<number | null>(null)
   const current = stack[currentIndex]

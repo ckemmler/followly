@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  output: "export",
+  // output: "export",
   trailingSlash: true,
   reactStrictMode: true,
   allowedDevOrigins: ["preview.followly.eu", "dev.followly.eu", "live.followly.eu"],

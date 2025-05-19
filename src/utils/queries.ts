@@ -15,18 +15,27 @@ export const getScriptById = (id: string) => `
 
 export const getSceneById = (id: string) => `
   *[_type == "scene" && id == "${id}"][0]{
-		script->{
-			id,
-			stack[]{
-				frame->{
-					_id,
-					title,
-					frameType,
-					text,
-					componentName,
-					props
-				}
-			}
-		},
+    script->{
+      id,
+      stack[]{
+        triggers[]{
+          type,
+          standardEvent,
+          customEvent,
+          goTo->{
+            _id,
+            title
+          }
+        },
+        frame->{
+          _id,
+          title,
+          frameType,
+          text,
+          componentName,
+          props
+        }
+      }
+    },
   }
 `

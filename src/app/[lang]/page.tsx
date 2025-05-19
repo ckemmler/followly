@@ -1,5 +1,5 @@
 import { getLocalizedBlock, LANGUAGES, LocalizedBlock } from "@/utils/languages";
-import { Snippet } from "@generated/schemas";
+import { Snippet } from "@sanity-types";
 import LanguageSelector from "@/components/LanguageSelector";
 // import ClientVideo360Wrapper from "@/components/Video360BackgroundWrapper";
 import AnimatedPages from "@/components/AnimatedPages";
@@ -36,7 +36,6 @@ async function getSnippets(): Promise<Record<string, LocalizedBlock[]>> {
   }
 
   const { result }: { result: Snippet[] } = await res.json();
-  console.log("Snippets fetched:", result);
   return Object.fromEntries(result.map((r) => [r.key, r.content]));
 }
 

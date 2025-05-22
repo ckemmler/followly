@@ -35,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${cinzel.variable} ${cormorant.variable} ${libreBaskerville.variable} antialiased`}>{children}</body>
+      <body className={`${cinzel.variable} ${cormorant.variable} ${libreBaskerville.variable} antialiased bg-black`}>{children}</body>
     </html>
   );
 }

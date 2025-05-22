@@ -19,8 +19,9 @@ export default function SceneClient({ params, scene, stack }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
   const [nextIndex, setNextIndex] = useState<number | null>(null)
-  const [animDirection, setAnimDirection] = useState<'onScrollUp' | 'onScrollDown' | null>(null)
+  const [animDirection, setAnimDirection] = useState<'onSwipeUp' | 'onSwipeDown' | 'onSwipeLeft' | 'onSwipeRight' | null>(null)
   const touchStartY = useRef<number | null>(null)
+  const touchStartX = useRef<number | null>(null)
   const current = stack[currentIndex]
   const scrollLockRef = useRef(false)
   const lastScrollTime = useRef(0)
@@ -29,7 +30,7 @@ export default function SceneClient({ params, scene, stack }: Props) {
 
   // Animate transition between cards
   const animateTransition = useCallback(
-    (dir: 'onScrollUp' | 'onScrollDown', targetIndex: number) => {
+    (dir: 'onSwipeUp' | 'onSwipeDown' | 'onSwipeLeft' | 'onSwipeRight', targetIndex: number) => {
       if (!cardRef.current || targetIndex === null) {
         setCurrentIndex(targetIndex)
         setIsAnimating(false)
@@ -48,10 +49,22 @@ export default function SceneClient({ params, scene, stack }: Props) {
   useEffect(() => {
     if (!isAnimating || nextIndex === null || animDirection === null) return;
     if (!cardRef.current || !nextCardRef.current) return;
-    // Prepare next card position
+    let gsapPropsOut, gsapPropsIn;
+    if (animDirection === 'onSwipeUp') {
+      gsapPropsOut = { y: -60, opacity: 0 };
+      gsapPropsIn = { y: 60, opacity: 0 };
+    } else if (animDirection === 'onSwipeDown') {
+      gsapPropsOut = { y: 60, opacity: 0 };
+      gsapPropsIn = { y: -60, opacity: 0 };
+    } else if (animDirection === 'onSwipeLeft') {
+      gsapPropsOut = { x: -120, opacity: 0 };
+      gsapPropsIn = { x: 120, opacity: 0 };
+    } else if (animDirection === 'onSwipeRight') {
+      gsapPropsOut = { x: 120, opacity: 0 };
+      gsapPropsIn = { x: -120, opacity: 0 };
+    }
     gsap.set(nextCardRef.current, {
-      y: animDirection === 'onScrollUp' ? 60 : -60,
-      opacity: 0,
+      ...gsapPropsIn,
       position: 'absolute',
       width: '100%',
       height: '100%',
@@ -62,24 +75,29 @@ export default function SceneClient({ params, scene, stack }: Props) {
       width: '100%',
       height: '100%',
     });
-    // Animate current card out, next card in
     gsap.to(cardRef.current, {
-      y: animDirection === 'onScrollUp' ? -60 : 60,
-      opacity: 0,
+      ...gsapPropsOut,
       duration: 0.4,
       onComplete: () => {
         gsap.to(nextCardRef.current, {
+          x: 0,
           y: 0,
           opacity: 1,
           duration: 0.4,
           onComplete: () => {
-            setCurrentIndex(nextIndex)
-            setIsAnimating(false)
-            setNextIndex(null)
-            setAnimDirection(null)
-            // Reset transforms
-            if (cardRef.current) gsap.set(cardRef.current, { clearProps: 'all' })
-            if (nextCardRef.current) gsap.set(nextCardRef.current, { clearProps: 'all' })
+            // Hide the previous card immediately after animation
+            if (cardRef.current) {
+              cardRef.current.style.visibility = 'hidden';
+            }
+            setTimeout(() => {
+              setCurrentIndex(nextIndex)
+              setIsAnimating(false)
+              setNextIndex(null)
+              setAnimDirection(null)
+              // Reset transforms
+              if (cardRef.current) gsap.set(cardRef.current, { clearProps: 'all', visibility: '' })
+              if (nextCardRef.current) gsap.set(nextCardRef.current, { clearProps: 'all' })
+            }, 0)
           },
         })
       },
@@ -87,14 +105,15 @@ export default function SceneClient({ params, scene, stack }: Props) {
   }, [isAnimating, nextIndex, animDirection])
 
   // Navigation logic
+  type AnimDir = 'onSwipeUp' | 'onSwipeDown' | 'onSwipeLeft' | 'onSwipeRight';
   const navigate = useCallback(
-    (eventName: string) => {
+    (eventName: AnimDir) => {
       if (isAnimating) return
       const trigger = current?.triggers?.find(t => t.standardEvent === eventName)
       const targetId = trigger?.goTo?._id
       const targetIndex = stack.findIndex(f => f.frame._id === targetId)
       if (targetIndex !== -1 && targetIndex !== currentIndex) {
-        animateTransition(eventName as 'onScrollUp' | 'onScrollDown', targetIndex)
+        animateTransition(eventName, targetIndex)
       }
     },
     [current, stack, currentIndex, animateTransition, isAnimating]
@@ -104,11 +123,11 @@ export default function SceneClient({ params, scene, stack }: Props) {
   useEffect(() => {
     if (!current) return
     const handleScroll = (e: WheelEvent) => {
-      e.preventDefault(); // Prevent browser scroll/bounce
+      e.preventDefault();
       const now = Date.now()
       if (Math.abs(e.deltaY) < 10) return
       if (scrollLockRef.current && now - lastScrollTime.current < 400) return
-      const dir = e.deltaY > 0 ? 'onScrollDown' : 'onScrollUp'
+      const dir = e.deltaY > 0 ? 'onSwipeDown' : 'onSwipeUp'
       lastScrollTime.current = now
       scrollLockRef.current = true
       navigate(dir)
@@ -117,17 +136,27 @@ export default function SceneClient({ params, scene, stack }: Props) {
       }, 400)
     }
     const handleTouchStart = (e: TouchEvent) => {
-      e.preventDefault(); // Prevent browser scroll/bounce
+      e.preventDefault();
       touchStartY.current = e.touches[0].clientY
+      touchStartX.current = e.touches[0].clientX
     }
     const handleTouchEnd = (e: TouchEvent) => {
-      e.preventDefault(); // Prevent browser scroll/bounce
-      const start = touchStartY.current
-      const end = e.changedTouches[0].clientY
-      if (start === null) return
-      const delta = start - end
-      // Swipe up means next card (onScrollDown), swipe down means previous card (onScrollUp)
-      const dir = delta > 30 ? 'onScrollDown' : delta < -30 ? 'onScrollUp' : null
+      e.preventDefault();
+      const startY = touchStartY.current
+      const endY = e.changedTouches[0].clientY
+      const startX = touchStartX.current
+      const endX = e.changedTouches[0].clientX
+      if (startY === null || startX === null) return
+      const deltaY = startY - endY
+      const deltaX = startX - endX
+      let dir: AnimDir | null = null
+      if (Math.abs(deltaY) > Math.abs(deltaX)) {
+        if (deltaY > 30) dir = 'onSwipeDown'
+        else if (deltaY < -30) dir = 'onSwipeUp'
+      } else {
+        if (deltaX > 30) dir = 'onSwipeLeft'
+        else if (deltaX < -30) dir = 'onSwipeRight'
+      }
       if (dir) navigate(dir)
     }
     window.addEventListener('wheel', handleScroll, { passive: false })

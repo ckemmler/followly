@@ -57,8 +57,10 @@ export default defineType({
 											options: {
 												list: [
 													{ title: 'onClick', value: 'onClick' },
-													{ title: 'onScrollDown', value: 'onScrollDown' },
-													{ title: 'onScrollUp', value: 'onScrollUp' },
+													{ title: 'onSwipeDown', value: 'onSwipeDown' },
+													{ title: 'onSwipeUp', value: 'onSwipeUp' },
+													{ title: 'onSwipeRight', value: 'onSwipeRight' },
+													{ title: 'onSwipeLeft', value: 'onSwipeLeft' },
 													{ title: 'onTimeout', value: 'onTimeout' },
 												],
 											},

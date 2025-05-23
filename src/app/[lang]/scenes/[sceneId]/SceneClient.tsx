@@ -121,7 +121,7 @@ export default function SceneClient({ params, scene, stack }: Props) {
         onSwipeUp: 'onScrollDown',
         onSwipeDown: 'onScrollUp',
         onSwipeLeft: 'onSwipeLeft',
-        onSwipeRight: 'onSwipeRight',
+        onSwipeRight: 'onScrollRight',
       }
       // Try both mapped and original event names for compatibility
       const possibleEvents = [animDirToStandardEvent[eventName], eventName]
@@ -158,15 +158,13 @@ export default function SceneClient({ params, scene, stack }: Props) {
       touchStartY.current = e.touches[0].clientY
       touchStartX.current = e.touches[0].clientX
     }
-    const handleTouchEnd = (e: TouchEvent) => {
-      e.preventDefault();
-      const startY = touchStartY.current
-      const endY = e.changedTouches[0].clientY
-      const startX = touchStartX.current
-      const endX = e.changedTouches[0].clientX
-      if (startY === null || startX === null) return
-      const deltaY = endY - startY
-      const deltaX = endX - startX
+    const swipeTriggered = { current: false }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (swipeTriggered.current) return
+      if (touchStartY.current === null || touchStartX.current === null) return
+      const deltaY = e.touches[0].clientY - touchStartY.current
+      const deltaX = e.touches[0].clientX - touchStartX.current
       let dir: AnimDir | null = null
       if (Math.abs(deltaY) > Math.abs(deltaX)) {
         if (deltaY < -30) dir = 'onSwipeUp'
@@ -175,9 +173,19 @@ export default function SceneClient({ params, scene, stack }: Props) {
         if (deltaX < -30) dir = 'onSwipeLeft'
         else if (deltaX > 30) dir = 'onSwipeRight'
       }
-      if (dir) navigate(dir)
+      if (dir) {
+        swipeTriggered.current = true
+        navigate(dir)
+      }
+    }
+    const handleTouchEnd = (e: TouchEvent) => {
+      e.preventDefault();
+      swipeTriggered.current = false
+      touchStartY.current = null
+      touchStartX.current = null
     }
     // Mouse gesture handlers for desktop swipe left/right
+    const mouseSwipeTriggered = { current: false }
     const handleMouseDown = (e: MouseEvent) => {
       // Only left mouse button
       if (e.button !== 0) return
@@ -185,8 +193,9 @@ export default function SceneClient({ params, scene, stack }: Props) {
       mouseStartY.current = e.clientY
       mouseDragging.current = true
     }
-    const handleMouseUp = (e: MouseEvent) => {
-      if (!mouseDragging.current || mouseStartX.current === null || mouseStartY.current === null) return
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!mouseDragging.current || mouseSwipeTriggered.current) return
+      if (mouseStartX.current === null || mouseStartY.current === null) return
       const deltaX = e.clientX - mouseStartX.current
       const deltaY = e.clientY - mouseStartY.current
       let dir: AnimDir | null = null
@@ -194,21 +203,34 @@ export default function SceneClient({ params, scene, stack }: Props) {
         if (deltaX < 0) dir = 'onSwipeLeft'
         else dir = 'onSwipeRight'
       }
-      if (dir) navigate(dir)
+      if (dir) {
+        mouseSwipeTriggered.current = true
+        mouseDragging.current = false
+        mouseStartX.current = null
+        mouseStartY.current = null
+        navigate(dir)
+      }
+    }
+    const handleMouseUp = (e: MouseEvent) => {
       mouseDragging.current = false
       mouseStartX.current = null
       mouseStartY.current = null
+      mouseSwipeTriggered.current = false
     }
     const handleMouseLeave = () => {
       mouseDragging.current = false
       mouseStartX.current = null
       mouseStartY.current = null
+      // Optionally reset mouseSwipeTriggered as well
+      // mouseSwipeTriggered.current = false
     }
     // Attach listeners
     window.addEventListener('wheel', handleScroll, { passive: false })
     window.addEventListener('touchstart', handleTouchStart, { passive: false })
+    window.addEventListener('touchmove', handleTouchMove, { passive: false })
     window.addEventListener('touchend', handleTouchEnd, { passive: false })
     window.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseup', handleMouseUp)
     window.addEventListener('mouseleave', handleMouseLeave)
     // Prevent body scroll
@@ -216,8 +238,10 @@ export default function SceneClient({ params, scene, stack }: Props) {
     return () => {
       window.removeEventListener('wheel', handleScroll)
       window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchend', handleTouchEnd)
       window.removeEventListener('mousedown', handleMouseDown)
+      window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
       window.removeEventListener('mouseleave', handleMouseLeave)
       document.body.style.overflow = '';

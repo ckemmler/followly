@@ -27,6 +27,10 @@ export default function SceneClient({ params, scene, stack }: Props) {
   const lastScrollTime = useRef(0)
   const cardRef = useRef<HTMLDivElement>(null)
   const nextCardRef = useRef<HTMLDivElement>(null)
+  // Mouse swipe state
+  const mouseStartX = useRef<number | null>(null)
+  const mouseStartY = useRef<number | null>(null)
+  const mouseDragging = useRef(false)
 
   // Animate transition between cards
   const animateTransition = useCallback(
@@ -51,11 +55,13 @@ export default function SceneClient({ params, scene, stack }: Props) {
     if (!cardRef.current || !nextCardRef.current) return;
     let gsapPropsOut, gsapPropsIn;
     if (animDirection === 'onSwipeUp') {
-      gsapPropsOut = { y: -60, opacity: 0 };
-      gsapPropsIn = { y: 60, opacity: 0 };
-    } else if (animDirection === 'onSwipeDown') {
+      // Reverse: up now animates as down
       gsapPropsOut = { y: 60, opacity: 0 };
       gsapPropsIn = { y: -60, opacity: 0 };
+    } else if (animDirection === 'onSwipeDown') {
+      // Reverse: down now animates as up
+      gsapPropsOut = { y: -60, opacity: 0 };
+      gsapPropsIn = { y: 60, opacity: 0 };
     } else if (animDirection === 'onSwipeLeft') {
       gsapPropsOut = { x: -120, opacity: 0 };
       gsapPropsIn = { x: 120, opacity: 0 };
@@ -108,8 +114,20 @@ export default function SceneClient({ params, scene, stack }: Props) {
   type AnimDir = 'onSwipeUp' | 'onSwipeDown' | 'onSwipeLeft' | 'onSwipeRight';
   const navigate = useCallback(
     (eventName: AnimDir) => {
+			console.log('navigate', eventName)
       if (isAnimating) return
-      const trigger = current?.triggers?.find(t => t.standardEvent === eventName)
+      // Reverse mapping for up/down
+      const animDirToStandardEvent: Record<AnimDir, string> = {
+        onSwipeUp: 'onScrollDown',
+        onSwipeDown: 'onScrollUp',
+        onSwipeLeft: 'onSwipeLeft',
+        onSwipeRight: 'onSwipeRight',
+      }
+      // Try both mapped and original event names for compatibility
+      const possibleEvents = [animDirToStandardEvent[eventName], eventName]
+      const trigger = current?.triggers?.find(
+        t => possibleEvents.includes(t.standardEvent)
+      )
       const targetId = trigger?.goTo?._id
       const targetIndex = stack.findIndex(f => f.frame._id === targetId)
       if (targetIndex !== -1 && targetIndex !== currentIndex) {
@@ -119,7 +137,7 @@ export default function SceneClient({ params, scene, stack }: Props) {
     [current, stack, currentIndex, animateTransition, isAnimating]
   )
 
-  // Scroll and swipe logic
+  // Scroll, swipe, and mouse gesture logic
   useEffect(() => {
     if (!current) return
     const handleScroll = (e: WheelEvent) => {
@@ -147,27 +165,61 @@ export default function SceneClient({ params, scene, stack }: Props) {
       const startX = touchStartX.current
       const endX = e.changedTouches[0].clientX
       if (startY === null || startX === null) return
-      const deltaY = startY - endY
-      const deltaX = startX - endX
+      const deltaY = endY - startY
+      const deltaX = endX - startX
       let dir: AnimDir | null = null
       if (Math.abs(deltaY) > Math.abs(deltaX)) {
-        if (deltaY > 30) dir = 'onSwipeDown'
-        else if (deltaY < -30) dir = 'onSwipeUp'
+        if (deltaY < -30) dir = 'onSwipeUp'
+        else if (deltaY > 30) dir = 'onSwipeDown'
       } else {
-        if (deltaX > 30) dir = 'onSwipeLeft'
-        else if (deltaX < -30) dir = 'onSwipeRight'
+        if (deltaX < -30) dir = 'onSwipeLeft'
+        else if (deltaX > 30) dir = 'onSwipeRight'
       }
       if (dir) navigate(dir)
     }
+    // Mouse gesture handlers for desktop swipe left/right
+    const handleMouseDown = (e: MouseEvent) => {
+      // Only left mouse button
+      if (e.button !== 0) return
+      mouseStartX.current = e.clientX
+      mouseStartY.current = e.clientY
+      mouseDragging.current = true
+    }
+    const handleMouseUp = (e: MouseEvent) => {
+      if (!mouseDragging.current || mouseStartX.current === null || mouseStartY.current === null) return
+      const deltaX = e.clientX - mouseStartX.current
+      const deltaY = e.clientY - mouseStartY.current
+      let dir: AnimDir | null = null
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 30) {
+        if (deltaX < 0) dir = 'onSwipeLeft'
+        else dir = 'onSwipeRight'
+      }
+      if (dir) navigate(dir)
+      mouseDragging.current = false
+      mouseStartX.current = null
+      mouseStartY.current = null
+    }
+    const handleMouseLeave = () => {
+      mouseDragging.current = false
+      mouseStartX.current = null
+      mouseStartY.current = null
+    }
+    // Attach listeners
     window.addEventListener('wheel', handleScroll, { passive: false })
     window.addEventListener('touchstart', handleTouchStart, { passive: false })
     window.addEventListener('touchend', handleTouchEnd, { passive: false })
+    window.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('mouseup', handleMouseUp)
+    window.addEventListener('mouseleave', handleMouseLeave)
     // Prevent body scroll
     document.body.style.overflow = 'hidden';
     return () => {
       window.removeEventListener('wheel', handleScroll)
       window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('touchend', handleTouchEnd)
+      window.removeEventListener('mousedown', handleMouseDown)
+      window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('mouseleave', handleMouseLeave)
       document.body.style.overflow = '';
     }
   }, [current, navigate, stack])

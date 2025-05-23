@@ -126,7 +126,7 @@ export default function SceneClient({ params, scene, stack }: Props) {
       // Try both mapped and original event names for compatibility
       const possibleEvents = [animDirToStandardEvent[eventName], eventName]
       const trigger = current?.triggers?.find(
-        t => possibleEvents.includes(t.standardEvent)
+        t => t.standardEvent !== undefined && possibleEvents.includes(t.standardEvent)
       )
       const targetId = trigger?.goTo?._id
       const targetIndex = stack.findIndex(f => f.frame._id === targetId)
@@ -211,7 +211,7 @@ export default function SceneClient({ params, scene, stack }: Props) {
         navigate(dir)
       }
     }
-    const handleMouseUp = (e: MouseEvent) => {
+    const handleMouseUp = () => {
       mouseDragging.current = false
       mouseStartX.current = null
       mouseStartY.current = null
